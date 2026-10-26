@@ -30,17 +30,32 @@ class AlienInvasion:
         while True:
             self._check_events()
             self.ship.update()
+            self._update_bullets()
             self._update_aliens()
-            self.bullets.update()
-            # get rid of bullets that have disappeared.
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <= 0:
-                    self.bullets.remove(bullet)
             self._update_screen()
+
+    def _update_bullets(self):
+        """Move bullets, remove old bullets, and check collisions."""
+        self.bullets.update()
+
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
+        self._check_bullet_alien_collisions()
+
+    def _check_bullet_alien_collisions(self):
+        """Remove bullets and aliens that collide."""
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True
+        )
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
 
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
-        if len(self.bullets) < 3:  # Limit the number of bullets on screen
+        if len(self.bullets) < self.settings.bullets_allowed:  # Limit the number of bullets on screen
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
           
