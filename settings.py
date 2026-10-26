@@ -16,3 +16,14 @@ class Settings:
         self.bullet_width = 3
         self.bullet_height = 15
         self.bullet_color = (60, 60, 60)
+
+        self.bullets_allowed = 3
+
+        #Ship lives.
+        self.ship_limit = 3
+
+        #Alien settings. 
+        self.alien_speed = 1.0
+        self.fleet_drop_speed = 10
+        # 1 means right; -1 means left.
+        self.fleet_direction = 1
