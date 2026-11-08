@@ -7,6 +7,7 @@ from bullet import Bullet
 from alien import Alien
 from time import sleep
 from game_stats import GameStats
+from button import Button
 
 
 class AlienInvasion:
@@ -18,7 +19,7 @@ class AlienInvasion:
 
         self.settings = Settings()
         self.stats = GameStats(self)
-        self.game_active = True
+        self.game_active = False
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
@@ -28,6 +29,7 @@ class AlienInvasion:
         self.bullets = Group()
         self.aliens = Group()
         self._create_fleet()
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -71,6 +73,8 @@ class AlienInvasion:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self._check_play_button(event.pos)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     self.ship.moving_right = True
@@ -85,6 +89,18 @@ class AlienInvasion:
                     self.ship.moving_right = False
                 elif event.key == pygame.K_LEFT:
                     self.ship.moving_left = False
+
+    def _check_play_button(self, mouse_pos):
+        """Start a fresh game when Play is clicked."""
+        if not self.game_active and self.play_button.rect.collidepoint(mouse_pos):
+            self.stats.reset_status()
+            self.bullets.empty()
+            self.aliens.empty()
+            self._create_fleet()
+            self.ship.center_ship()
+            self.ship.moving_left = False
+            self.ship.moving_right = False
+            self.game_active = True
 
     def _update_aliens(self):
         """Move aliens and check for collisions with the ship."""
@@ -165,6 +181,10 @@ class AlienInvasion:
             bullet.draw_bullet()
 
         self.aliens.draw(self.screen)
+
+        if not self.game_active:
+            self.play_button.draw_button()
+
         pygame.display.flip()
 
 if __name__ == '__main__':
